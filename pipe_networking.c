@@ -8,15 +8,15 @@
   args: int * to_client
 
   Performs the server side pipe 3 way handshake.
-  Sets *to_client to the file descriptor to the downstream pipe (Client --> Server).
+  Sets *to_client to the file descriptor to the downstream pipe.
 
-  returns the file descriptor for the upstream pipe (Server --> Client).
+  returns the file descriptor for the upstream pipe.
   =========================*/
 int server_handshake(int *to_client) {
 
   int mkfifo_status = mkfifo("Sesame", 0644);
   if (mkfifo_status == -1) {
-    printf("MKFIFO SERVER BROKED\n");
+    printf("MKFIFO SERVER BROKED: %s\n", strerror(errno));
     exit(1);
   }
 
@@ -32,11 +32,10 @@ int server_handshake(int *to_client) {
 
   read(downstream, response, 200);
   printf("server got: |%s|\n", response);
-  remove("Sesame");
 
-  *to_client = downstream;
+  *to_client = upstream;
 
-  return upstream;
+  return downstream;
 }
 
 
@@ -45,15 +44,15 @@ int server_handshake(int *to_client) {
   args: int * to_server
 
   Performs the client side pipe 3 way handshake.
-  Sets *to_server to the file descriptor for the upstream pipe (Client --> Server).
+  Sets *to_server to the file descriptor for the upstream pipe.
 
-  returns the file descriptor for the downstream pipe (Server --> Client).
+  returns the file descriptor for the downstream pipe.
   =========================*/
 int client_handshake(int *to_server) {
 
   int mkfifo_status = mkfifo("ClientFIFO", 0644);
   if (mkfifo_status == -1) {
-    printf("MKFIFO CLIENT BROKED\n");
+    printf("MKFIFO CLIENT BROKED: %s\n", strerror(errno));
     exit(1);
   }
 
